@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMC Care - Hello Punekar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-left">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="PMC Care Logo" class="logo">
+            <nav>
+                <ul>
+                    <li><button class="head-button">HOME</button></li>
+                    <li><button class="head-button" onclick="window.location.href='{{ url_for('report') }}'">SERVICES</button></li>
+                    <li><button class="head-button">FEEDS</button></li>
+                    <li><button class="head-button">NEAR ME</button></li>
+                    <li><button class="head-button">DEALS</button></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="nav-right">
+            <div class="profile-icon">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <section class="left-column">
+            <h1>Hello Civic Star!</h1>
+            <h3><b>Follow us on Social Media</b></h3>
+            <div class="social-icons">
+                <a href="https://www.facebook.com/PuneMunicipalCorporation/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-square"></i></a>
+                <a href="https://twitter.com/punecorporation" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter-square"></i></a>
+                <a href="https://www.instagram.com/punemunicipalcorporation/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram-square"></i></a>
+            </div>
+        </section>
+
+        <section class="right-column">
+            <div class="logo-container">
+                <div>
+                    <img src="{{ url_for('static', filename='logo1.png') }}" alt="MMCOE" class="circular-logo-placeholder">
+                </div>
+            </div>
+            <h2><b>Join us for a citizen-centric experience!</b></h2>
+
+            <div class="login-buttons">
+                <button onclick="window.location.href='{{ url_for('register') }}'" class="citizen-btn">
+  Citizen Registration
+</button>
+
+
+                <button 
+                    class="citizen-btn"
+                    onclick="window.location.href='{{ url_for('login') }}';">
+                    Citizen Login
+                </button>
+
+                <button 
+                    class="citizen-btn"
+                    onclick="window.location.href='{{ url_for('employee') }}';">
+                    Employee Login
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html>

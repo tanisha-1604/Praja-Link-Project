@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Submit Report - PrajaLink</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      width: 90%;
+      max-width: 500px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      color: #555;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    textarea {
+      resize: vertical;
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      margin-top: 15px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .camera-section {
+      margin-top: 15px;
+      text-align: center;
+    }
+    video {
+      width: 100%;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+    .capture-btn {
+      background: #28a745;
+      margin-top: 10px;
+    }
+    #photo-preview {
+      width: 100%;
+      border-radius: 8px;
+      display: none;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Submit a New Report</h1>
+
+    <form action="/report" method="POST" enctype="multipart/form-data">
+      <label>Name:</label>
+      <input type="text" name="name" required>
+
+      <label>Location:</label>
+      <input type="text" name="location" required>
+
+      <label>Description:</label>
+      <textarea name="description" rows="4" required></textarea>
+
+      <label>Upload Image or Capture from Camera:</label>
+      <!-- Regular upload option -->
+      <input type="file" id="image" name="image" accept="image/*" capture="environment">
+
+      <!-- Optional live camera capture -->
+      <div class="camera-section">
+        <video id="camera" autoplay></video>
+        <button type="button" class="capture-btn" onclick="capturePhoto()">📸 Capture Photo</button>
+        <img id="photo-preview" alt="Captured Photo">
+        <input type="hidden" id="captured_image" name="captured_image">
+      </div>
+
+      <button type="submit">Submit Report</button>
+    </form>
+  </div>
+
+  <script>
+    const camera = document.getElementById('camera');
+    const photoPreview = document.getElementById('photo-preview');
+    const capturedInput = document.getElementById('captured_image');
+
+    // Ask for camera permission and stream it to <video>
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+        .then(stream => {
+          camera.srcObject = stream;
+        })
+        .catch(err => {
+          console.error("Camera access denied:", err);
+        });
+    }
+
+    // Capture the current frame as a base64 image
+    function capturePhoto() {
+      const canvas = document.createElement('canvas');
+      canvas.width = camera.videoWidth;
+      canvas.height = camera.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(camera, 0, 0, canvas.width, canvas.height);
+      const dataURL = canvas.toDataURL('image/png');
+      photoPreview.src = dataURL;
+      photoPreview.style.display = 'block';
+      capturedInput.value = dataURL; // Store base64 image for backend
+    }
+  </script>
+</body>
+</html>

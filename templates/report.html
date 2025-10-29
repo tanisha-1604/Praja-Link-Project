@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Reports - PrajaLink (Admin)</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>All Reports (Admin)</h1>
+        <a href="{{ url_for('admin') }}" class="back-link">Admin Home</a>
+        {% for r in reports %}
+        <div class="report-card">
+            <h3>Report #{{ r.id }} — {{ r.created_at }}</h3>
+            <p><strong>Reporter:</strong> {{ r.name or "N/A" }}</p>
+            <p><strong>Location:</strong> {{ r.location or "N/A" }}</p>
+            <p><strong>Description:</strong> {{ r.description or "N/A" }}</p>
+
+            {% if r.image_path %}
+            <p><strong>Image:</strong></p>
+            <img src="{{ url_for('uploaded_file', filename=r.image_path.split('/')[-1]) }}" alt="Report Image" class="report-image" style="max-width:300px;">
+            {% endif %}
+
+            <p><strong>Severity:</strong> {{ r.severity or "Not set" }} |
+               <strong>Coverage:</strong> {{ r.coverage if r.coverage is not none else "N/A" }}</p>
+
+            {% if r.preview_path %}
+            <p><strong>Model Preview:</strong></p>
+            <img src="{{ url_for('uploaded_file', filename=r.preview_path.split('/')[-1]) }}" alt="Preview Image" style="max-width:300px;">
+            {% endif %}
+
+            <p><strong>Status:</strong> {{ r.status }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

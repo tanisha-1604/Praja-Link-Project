@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <title>Employee-Login</title>
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-left">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="PMC Care Logo" class="logo">
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">HOME</a></li>
+                    <li><a href="#">FEEDS</a></li>
+                    <li><a href="#">SERVICES</a></li>
+                    <li><a href="#">NEAR ME</a></li>
+                    <li><a href="#">DEALS</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="nav-right">
+            <button class="lang-button">मराठी</button>
+            <div class="profile-icon">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+    </header>
+
+    <main class="login-container">
+        <form class="login-form">
+            <h1>Employee Login</h1>
+            <p>Please enter your details carefully.</p>
+            
+            <div class="form-group">
+                <label for="citizen-name">Employee Name</label>
+                <input type="text" id="citizen-name" name="citizen-name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="employee-id">Employee ID</label>
+                <input type="text" id="employee-id" name="employee-id" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="profile-status">Profile Status</label>
+                <select id="profile-status" name="profile-status" required>
+                    <option value="" disabled selected>Select your profile</option>
+                    <option value="officer">Officer</option>
+                    <option value="clerk">Clerk</option>
+                    <option value="admin">Administrator</option>
+                    <option value="field-staff">Field Staff</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email ID</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <button type="submit" class="submit-btn">Submit</button>
+        </form>
+    </main>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html>

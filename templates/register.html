@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citizen Registration | PMC Care</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-left">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="PMC Care Logo" class="logo">
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('admin') }}" class="active">HOME</a></li>
+                    <li><a href="#">FEEDS</a></li>
+                    <li><a href="#">SERVICES</a></li>
+                    <li><a href="#">NEAR ME</a></li>
+                    <li><a href="#">DEALS</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="nav-right">
+            <button class="lang-button">मराठी</button>
+            <div class="profile-icon">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+    </header>
+
+    <main class="login-container">
+        <form class="login-form" id="register-form">
+            <h1>Citizen Registration</h1>
+            <p>Please fill in your details to register as a citizen.</p>
+            
+            <div class="form-group">
+                <label for="citizen-name">Full Name</label>
+                <input type="text" id="citizen-name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="dob">Date of Birth</label>
+                <input type="date" id="dob" name="dob" required>
+            </div>
+            
+            <div class="form-group">
+                <span style="display: flex; gap: 10px; align-items: center;">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" name="age" style="width: 25%;" min="1" required>
+                    <label for="gender" class="form-group">Gender</label>
+                    <select id="gender" name="gender" style="width: 75%;" required>
+                        <option value="" disabled selected>Select your Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Transgender">Transgender</option>
+                    </select>
+                </span>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" required pattern="[0-9]{10}" maxlength="10">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email ID</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <button type="submit" class="submit-btn">Register</button>
+        </form>
+    </main>
+
+    <script>
+    document.querySelector("#register-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        // ✅ Explicitly create object to ensure proper key mapping
+        const formData = {
+            name: document.getElementById("citizen-name").value.trim(),
+            dob: document.getElementById("dob").value.trim(),
+            age: document.getElementById("age").value.trim(),
+            gender: document.getElementById("gender").value.trim(),
+            phone: document.getElementById("phone").value.trim(),
+            email: document.getElementById("email").value.trim()
+        };
+
+        try {
+            const response = await fetch("/api/citizens", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert(result.message || "Registration successful!");
+                // ✅ Delay redirect slightly for better UX
+                setTimeout(() => {
+                    window.location.href = "/report";
+                }, 800);
+            } else {
+                alert(result.message || "Failed to register. Please try again.");
+            }
+        } catch (err) {
+            alert("Error submitting form. Please try again.");
+            console.error(err);
+        }
+    });
+    </script>
+</body>
+</html>

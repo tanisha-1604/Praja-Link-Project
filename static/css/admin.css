@@ -1,0 +1,325 @@
+/* --- General Styles --- */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    color: #333;
+    /* Adds the faint bird silhouette to the top right */
+    background-image: url('https://via.placeholder.com/300x300.png?text=Bird+Silhouette');
+    background-repeat: no-repeat;
+    background-position: top 80px right 20%;
+    background-size: 300px;
+    opacity: 0.9;
+}
+
+/* --- Navbar Styles --- */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 30px;
+    border-bottom: 2px solid #E6E0F0;
+    background-color: #fff;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    height: 40px;
+    margin-right: 30px;
+}
+
+.nav-left nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    gap: 25px;
+}
+
+.nav-left nav a {
+    text-decoration: none;
+    color: #555;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.nav-left nav a.active,
+.nav-left nav a:hover {
+    color: #6A1B9A; /* Dark Purple */
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.head-button {
+    background-color: #6A1B9A; /* Dark Purple */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 9px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.head-button:hover {
+    border: #6A1B9A 1.5px solid;
+    background-color: #fff;
+    color: #6A1B9A;
+}
+
+.profile-icon {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #6A1B9A;
+    font-size: 18px;
+}
+
+/* --- Main Content Styles --- */
+.main-container {
+    display: grid;
+    margin-left: 50px;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    min-height: calc(100vh - 80px); /* Full height minus navbar */
+    padding: 20px 50px;
+}
+
+/* --- Left Column --- */
+.left-column {
+    padding-right: 20px;
+    /* Faded city skyline background */
+    background-image: url('https://via.placeholder.com/600x200.png?text=Faded+City+Skyline');
+    background-repeat: no-repeat;
+    background-position: bottom left;
+    background-size: contain;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.left-column h1 {
+    font-size: 64px;
+    color: #4A148C; /* Darker Purple */
+    margin: 0;
+}
+
+.left-column p {
+    font-size: 16px;
+    color: #555;
+    margin-top: 20px;
+}
+
+.social-icons {
+    margin-top: 15px;
+}
+
+.social-icons a {
+    text-decoration: none;
+    color: #4A148C;
+    font-size: 32px;
+    margin-right: 15px;
+}
+
+/* --- Right Column --- */
+.right-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-left: 20px;
+}
+
+.logo-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+/* Placeholder for the circular logo */
+.circular-logo-placeholder {
+    width: 150px;
+    height: 150px;
+    padding: 30px;
+    border-radius: 50%;
+    border: 1px solid #E6E0F0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: #6A1B9A;
+    background-color: #f9f7fd;
+    text-align: center;
+}
+
+.right-column h2 {
+    font-size: 24px;
+    color: #4A148C;
+    margin-bottom: 30px;
+    font-weight: 500;
+}
+
+.login-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 300px;
+}
+
+.citizen-btn  {
+    background-color: #fff;
+    border: 2px solid #6A1B9A;
+    color: #6A1B9A;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.citizen-btn:hover {
+    background-color: #6A1B9A;
+    color: #fff;
+}
+
+ /* --- Login Form Styles --- */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 20px;
+    min-height: calc(100vh - 150px);
+}
+
+.login-form {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 500px;
+    border-top: 5px solid var(--primary-purple);
+}
+
+.login-form h1 {
+    color: var(--dark-purple);
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 28px;
+}
+
+.login-form p {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+       
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-group input, select{
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box; /* Important for padding */
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-purple);
+}
+
+#profile-status {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.submit-btn {
+    display: block;
+    width: 50%;
+    margin: 20px auto;
+    padding: 15px;
+    background-color: var(--primary-purple);
+    color: darkviolet;
+    background-color: #E6E0F0;
+    border: solid 1px darkviolet;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+    background-color: var(--dark-purple);
+}
+
+ /* --- Responsive Design --- */
+
+@media (max-width: 768px) {
+    .hamburger {
+        display: block;
+    }
+
+.main-nav {
+    display: none; 
+    flex-direction: column;
+    position: absolute;
+    top: 65px;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+            
+.main-nav.active {
+    display: flex;
+    }
+
+.main-nav ul {
+    flex-direction: column;
+    width: 100%;
+    text-align: center;
+    }
+
+.main-nav li {
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.login-form {
+    padding: 30px;
+    }
+}

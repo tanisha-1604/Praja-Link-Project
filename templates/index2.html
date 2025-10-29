@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CivicReport - Community Issue Reporting Platform</title>
+
+    <meta
+      name="description"
+      content="Report and track community issues like waste management, drainage problems, and pollution. Help build a better, cleaner community through civic engagement."
+    />
+    <meta name="author" content="CivicReport" />
+
+    <!-- Open Graph -->
+    <meta
+      property="og:title"
+      content="CivicReport - Community Issue Reporting Platform"
+    />
+    <meta
+      property="og:description"
+      content="Report and track community issues like waste management, drainage problems, and pollution. Help build a better, cleaner community through civic engagement."
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://lovable.dev/opengraph-image-p98pqg.png"
+    />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@lovable_dev" />
+    <meta
+      name="twitter:image"
+      content="https://lovable.dev/opengraph-image-p98pqg.png"
+    />
+
+    <!-- Civic Design System CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}" />
+    <style>
+      /* ===== Basic Civic UI Layout ===== */
+      header {
+        background: var(--gradient-civic);
+        color: hsl(var(--primary-foreground));
+        text-align: center;
+        padding: 2rem 1rem;
+        box-shadow: var(--shadow-civic);
+      }
+
+      header h1 {
+        font-size: 2rem;
+        margin: 0.5rem 0;
+      }
+
+      header p {
+        font-size: 1rem;
+        opacity: 0.9;
+      }
+
+      main {
+        padding: 2rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .card {
+        background: hsl(var(--card));
+        color: hsl(var(--card-foreground));
+        border: 1px solid hsl(var(--border));
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-card);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-floating);
+      }
+
+      .card h2 {
+        color: hsl(var(--primary));
+        margin-bottom: 0.5rem;
+      }
+
+      .card p {
+        color: hsl(var(--muted-foreground));
+        font-size: 0.95rem;
+      }
+
+      footer {
+        text-align: center;
+        padding: 1.5rem;
+        background-color: hsl(var(--muted));
+        color: hsl(var(--muted-foreground));
+        font-size: 0.9rem;
+      }
+
+      .btn-report {
+        display: inline-block;
+        background-color: hsl(var(--primary));
+        color: hsl(var(--primary-foreground));
+        padding: 0.75rem 1.25rem;
+        border-radius: var(--radius);
+        text-decoration: none;
+        font-weight: 600;
+        box-shadow: var(--shadow-card);
+        transition: background 0.3s ease;
+      }
+
+      .btn-report:hover {
+        background-color: hsl(var(--civic-green));
+      }
+
+      /* Optional Dark Mode Preview */
+      .toggle-dark {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+        background: hsl(var(--accent));
+        color: hsl(var(--accent-foreground));
+        border: none;
+        padding: 0.6rem 1rem;
+        border-radius: var(--radius);
+        cursor: pointer;
+        font-weight: 600;
+        box-shadow: var(--shadow-card);
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1>CivicReport</h1>
+      <p>Report and track community issues for a cleaner, sustainable city.</p>
+      <a href="#" class="btn-report">Report an Issue</a>
+    </header>
+
+    <main>
+      <div class="card">
+        <h2>Waste Management</h2>
+        <p>
+          Report uncollected garbage or overflowing bins in your neighborhood.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>Drainage Problems</h2>
+        <p>
+          Notify authorities about waterlogging or blocked drainage systems to
+          prevent urban flooding.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>Pollution Reports</h2>
+        <p>
+          Highlight air, water, or noise pollution in your area for immediate
+          civic response.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>Road & Infrastructure</h2>
+        <p>
+          Report potholes, damaged signs, or broken streetlights to improve
+          public safety.
+        </p>
+      </div>
+    </main>
+
+    <footer>
+      &copy; 2025 CivicReport | Built for community transparency and
+      environmental sustainability.
+    </footer>
+
+    <!-- Dark mode toggle -->
+    <button class="toggle-dark" onclick="document.body.classList.toggle('dark')">
+      Toggle Dark Mode
+    </button>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+  </body>
+</html>
