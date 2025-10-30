@@ -1,13 +1,15 @@
 from flask import Flask, request, jsonify, render_template
+from flask import redirect, url_for, session
 from flask_cors import CORS
 import sqlite3
 import os
 from datetime import datetime
 import base64
 
+
 app = Flask(__name__)
 CORS(app)
-
+app.secret_key = "secret123" 
 
 # --- Home & Page Routes ---
 @app.route("/")
@@ -44,9 +46,39 @@ def register():
     return render_template("register.html")
 
 
-@app.route("/employee")
+@app.route("/employee", methods=["GET", "POST"])
 def employee():
+    if request.method == "POST":
+        name = request.form.get("citizen-name")
+        emp_id = request.form.get("employee-id")
+        password = request.form.get("password")
+        profile_status = request.form.get("profile-status")
+        phone = request.form.get("phone")
+        email = request.form.get("email")
+
+        # ✅ Simple example (you can later connect it to an employee DB)
+        if emp_id == "123" and password == "admin":
+            session["employee"] = name
+            return redirect(url_for("employee_dashboard"))
+        else:
+            return render_template("Employee.html", error="Invalid ID or password!")
+
     return render_template("Employee.html")
+
+@app.route("/employee/dashboard")
+def employee_dashboard():
+    if "employee" not in session:
+        return redirect(url_for("employee"))  # Redirect if not logged in
+
+    conn = sqlite3.connect("reports.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM reports ORDER BY created_at DESC")
+    reports = cursor.fetchall()
+    conn.close()
+
+    return render_template("employee_dashboard.html", reports=reports)
+
 
 @app.route("/login")
 def login():
@@ -180,6 +212,10 @@ def report():
     # 👇 If GET request → show report form
     return render_template("report_form.html")
 
+@app.route("/employee/logout")
+def employee_logout():
+    session.pop("employee", None)
+    return redirect(url_for("employee"))
 
 
 # --- Run App ---

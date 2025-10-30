@@ -1,0 +1,85 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f9fafb;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    background: #009231;
+    color: white;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logout-btn {
+    background: #ef4444;
+    color: white;
+    padding: 6px 12px;
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+.dashboard-container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+h3 {
+    color: #1e3a8a;
+    margin-bottom: 15px;
+}
+
+.issue-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: transform 0.2s ease;
+}
+
+.issue-card:hover {
+    transform: translateY(-3px);
+}
+
+.issue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-tags {
+    display: flex;
+    gap: 8px;
+}
+
+.status, .severity {
+    padding: 4px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    color: white;
+}
+
+.status.pending { background: #6b7280; }
+.status.resolved { background: #16a34a; }
+.status.review { background: #2563eb; }
+
+.severity.critical { background: #dc2626; }
+.severity.medium { background: #f59e0b; }
+.severity.low { background: #16a34a; }
+.severity.pending { background: #9ca3af; }
+
+.report-image {
+    margin-top: 10px;
+    max-width: 100%;
+    border-radius: 10px;
+}
+
+.no-data {
+    color: #6b7280;
+    text-align: center;
+}
