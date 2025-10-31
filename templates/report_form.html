@@ -3,110 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <title>Submit Report - PrajaLink</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/report.css') }}">
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      width: 90%;
-      max-width: 700px;
-      margin: 30px auto;
-      background: #fff;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-      color: #555;
-    }
-    input, textarea, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 6px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 14px;
-      box-sizing: border-box;
-    }
-    textarea {
-      resize: vertical;
-    }
-    button {
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      margin-top: 15px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    .camera-section {
-      margin-top: 15px;
-      text-align: center;
-    }
-    video {
-      width: 100%;
-      border-radius: 8px;
-      margin-top: 8px;
-    }
-    .capture-btn {
-      background: #28a745;
-      margin-top: 10px;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    #photo-preview {
-      width: 100%;
-      border-radius: 8px;
-      display: none;
-      margin-top: 10px;
-    }
-
-    /* Map styling */
-    #map {
-      height: 320px;
-      width: 100%;
-      border-radius: 8px;
-      margin-top: 12px;
-      border: 1px solid #ddd;
-    }
-
-    .coords-row {
-      display: flex;
-      gap: 10px;
-    }
-    .coords-row input {
-      width: 50%;
-    }
-
-    .hint {
-      font-size: 13px;
-      color: #666;
-      margin-top: 6px;
-    }
-  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Submit a New Report</h1>
+  <div class="container page-center">
+    <div class="card p-4 card-narrow">
+      <h1 class="section-title mb-3"><i class="fa-solid fa-clipboard-list"></i> Submit a New Report</h1>
 
     <form action="/report" method="POST" enctype="multipart/form-data">
       <label for="name">Name:</label>
@@ -125,7 +32,7 @@
       <!-- Optional live camera capture -->
       <div class="camera-section">
         <video id="camera" autoplay playsinline></video>
-        <button type="button" class="capture-btn" onclick="capturePhoto()">📸 Capture Photo</button>
+        <button type="button" class="capture-btn" onclick="capturePhoto()"><i class="fa-solid fa-camera"></i> Capture Photo</button>
         <img id="photo-preview" alt="Captured Photo">
         <input type="hidden" id="captured_image" name="captured_image">
       </div>
@@ -144,10 +51,11 @@
       <p class="hint">Allow location access when prompted. You can also tap the map to adjust the pin.</p>
 
       <!-- Map -->
-      <div id="map"></div>
+      <div id="map" class="my-2"></div>
 
-      <button type="submit">Submit Report</button>
+      <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Submit Report</button>
     </form>
+    </div>
   </div>
 
   <!-- Leaflet JS (placed before custom map script) -->
@@ -246,5 +154,6 @@
       // you could add logic to set map from typed coords if needed.
     });
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

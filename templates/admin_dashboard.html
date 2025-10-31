@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | PrajaLink</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkfDqZC1Zq9KKDvZL9Yl8a9kaoV5C1xTfLkG3B1Fz6G8xwG6Fz+6V2T8g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+</head>
+<body>
+  <header class="navbar">
+    <div class="brand"><i class="fa-solid fa-leaf"></i> PrajaLink Admin</div>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-filter="all"><i class="fa-solid fa-folder-open"></i> All</button>
+      <button class="tab" data-filter="Reported"><i class="fa-solid fa-circle text-reported"></i> Reported</button>
+      <button class="tab" data-filter="In Review"><i class="fa-solid fa-circle text-review"></i> In Review</button>
+      <button class="tab" data-filter="Resolved"><i class="fa-solid fa-circle text-resolved"></i> Resolved</button>
+    </nav>
+  </header>
+
+  <main class="container" id="cards">
+    {% for r in reports %}
+    {% set raw_status = r['status'] or 'Pending' %}
+    {% set display_status = 'Reported' if raw_status == 'Pending' else raw_status %}
+    <article class="card" data-status="{{ display_status }}" data-id="{{ r['id'] }}">
+      <header class="card__header">
+        <h3 class="card__title"><i class="fa-solid fa-flag"></i> {{ r['name'] or 'Untitled Report' }}</h3>
+        <span class="badge badge--{{ display_status | lower | replace(' ', '-') }}">{{ display_status }}</span>
+      </header>
+      <div class="card__body">
+        <p class="desc">{{ r['description'] }}</p>
+        <p class="meta"><i class="fa-solid fa-location-dot"></i> {{ r['location'] }}</p>
+        <p class="meta"><i class="fa-solid fa-calendar"></i> {{ r['created_at'] }}</p>
+        {% if r['image_path'] %}
+          <img class="thumb" src="{{ url_for('static', filename=r['image_path'].split('static/')[-1]) }}" alt="Report image">
+        {% endif %}
+      </div>
+      <footer class="card__footer">
+        <label class="control">
+          <i class="fa-solid fa-arrows-rotate"></i>
+          <select class="status-select">
+            <option value="Reported" {{ 'selected' if display_status=='Reported' else '' }}>Reported</option>
+            <option value="In Review" {{ 'selected' if display_status=='In Review' else '' }}>In Review</option>
+            <option value="Resolved" {{ 'selected' if display_status=='Resolved' else '' }}>Resolved</option>
+          </select>
+        </label>
+        <button class="btn update-btn"><i class="fa-solid fa-check"></i> Update</button>
+      </footer>
+    </article>
+    {% else %}
+      <p class="no-data">No reports found.</p>
+    {% endfor %}
+  </main>
+
+  <script>
+    // Tab filtering
+    const tabs = document.querySelectorAll('.tab');
+    const cardsWrap = document.getElementById('cards');
+    function applyFilter(filter) {
+      const cards = cardsWrap.querySelectorAll('.card');
+      cards.forEach(c => {
+        const st = c.getAttribute('data-status');
+        const show = (filter === 'all') || (st === filter);
+        c.style.display = show ? '' : 'none';
+      });
+    }
+    tabs.forEach(t => t.addEventListener('click', () => {
+      tabs.forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      applyFilter(t.dataset.filter);
+    }));
+
+    // Status update
+    async function updateStatus(card, status) {
+      const id = card.getAttribute('data-id');
+      try {
+        const res = await fetch(`/update_status/${id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status })
+        });
+        if (!res.ok) throw new Error('Request failed');
+        const data = await res.json();
+        const newStatus = data.status || status;
+        // Update badge
+        const badge = card.querySelector('.badge');
+        badge.textContent = newStatus;
+        badge.className = `badge badge--${newStatus.toLowerCase().replace(' ', '-')}`;
+        // Update data-status
+        card.setAttribute('data-status', newStatus);
+        // Re-apply current filter so it "moves" tabs visually
+        const active = document.querySelector('.tab.active');
+        if (active) applyFilter(active.dataset.filter);
+      } catch (e) {
+        alert('Failed to update status. Please try again.');
+      }
+    }
+
+    document.querySelectorAll('.card').forEach(card => {
+      const btn = card.querySelector('.update-btn');
+      const select = card.querySelector('.status-select');
+      btn.addEventListener('click', () => updateStatus(card, select.value));
+    });
+  </script>
+</body>
+</html>
+
+

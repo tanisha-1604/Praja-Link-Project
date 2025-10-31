@@ -69,15 +69,70 @@ def employee():
 def employee_dashboard():
     if "employee" not in session:
         return redirect(url_for("employee"))  # Redirect if not logged in
+    # Ensure DB and table exist to avoid runtime errors
+    try:
+        init_reports_db()
+    except Exception as e:
+        print("⚠️ init_reports_db failed:", e)
 
-    conn = sqlite3.connect("reports.db")
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM reports ORDER BY created_at DESC")
-    reports = cursor.fetchall()
-    conn.close()
+    try:
+        conn = sqlite3.connect("reports.db")
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM reports ORDER BY created_at DESC")
+        reports = cursor.fetchall()
+        conn.close()
+        error_message = None
+    except Exception as e:
+        print("⚠️ Error loading reports:", e)
+        reports = []
+        error_message = "Could not load reports from the database."
 
-    return render_template("employee_dashboard.html", reports=reports)
+    return render_template("employee_dashboard.html", reports=reports, error_message=error_message)
+
+
+# --- Admin Status Board (for employees) ---
+@app.route("/admin-dashboard")
+def admin_dashboard():
+    if "employee" not in session:
+        return redirect(url_for("employee"))
+
+    try:
+        conn = sqlite3.connect("reports.db")
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM reports ORDER BY created_at DESC")
+        reports = cur.fetchall()
+        conn.close()
+    except Exception as e:
+        print("⚠️ Error loading reports for admin dashboard:", e)
+        reports = []
+
+    return render_template("admin_dashboard.html", reports=reports)
+
+
+@app.route("/update_status/<int:report_id>", methods=["POST"])
+def update_status(report_id: int):
+    if "employee" not in session:
+        return jsonify({"message": "Unauthorized"}), 401
+
+    try:
+        data = request.get_json(force=True)
+        new_status = (data.get("status") or "").strip()
+        # Map display values back to DB values
+        # UI shows "Reported" for DB "Pending"
+        db_status = "Pending" if new_status == "Reported" else new_status
+
+        conn = sqlite3.connect("reports.db")
+        cur = conn.cursor()
+        cur.execute("UPDATE reports SET status = ? WHERE id = ?", (db_status, report_id))
+        conn.commit()
+        conn.close()
+
+        return jsonify({"message": "Status updated", "status": new_status})
+    except Exception as e:
+        print("⚠️ Failed to update status:", e)
+        return jsonify({"message": "Update failed"}), 500
 
 
 @app.route("/login")
