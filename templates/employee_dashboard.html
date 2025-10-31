@@ -33,6 +33,19 @@
 
             <p>{{ report['description'] }}</p>
             <p><i class="fa-solid fa-location-dot"></i> {{ report['location'] }}</p>
+            
+            {% if report['latitude'] and report['longitude'] %}
+            <p>
+                📍 <strong>Coordinates:</strong> 
+                {{ report['latitude'] }}, {{ report['longitude'] }}<br>
+                <a href="https://www.google.com/maps?q={{ report['latitude'] }},{{ report['longitude'] }}" 
+                   target="_blank" 
+                   class="map-link">
+                   View on Google Maps
+                </a>
+            </p>
+            {% endif %}
+
             <p><i class="fa-solid fa-calendar"></i> {{ report['created_at'] }}</p>
 
             {% if report['image_path'] %}

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registration Successful | PrajaLink</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; background: #f4f6f8; margin:0; padding:40px; }
+    .box { max-width:600px; margin:60px auto; background:#fff; padding:36px; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.08); text-align:center;}
+    .btn { background:#2563eb; color:#fff; border:none; padding:12px 22px; border-radius:10px; cursor:pointer; font-size:16px; }
+    .btn:hover{opacity:0.95;}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>{{ message }}</h2>
+    <p>You can now report an issue in your area.</p>
+    <button class="btn" onclick="location.href='{{ url_for('report') }}'">Report an Issue</button>
+  </div>
+</body>
+</html>

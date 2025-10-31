@@ -9,7 +9,7 @@ import base64
 
 app = Flask(__name__)
 CORS(app)
-app.secret_key = "secret123" 
+app.secret_key = "your_secret_key_here"  # change to a secure secret in production 
 
 # --- Home & Page Routes ---
 @app.route("/")
@@ -41,7 +41,7 @@ def register():
         conn.close()
 
         # After successful registration
-        return render_template("success.html", message="Registration successful!")
+        return render_template("report_redirect.html", message="Registration successful!")
 
     return render_template("register.html")
 
@@ -108,6 +108,7 @@ def init_citizen_db():
 def init_reports_db():
     conn = sqlite3.connect('reports.db')
     c = conn.cursor()
+    # Create table with latitude/longitude included (safe for new DBs)
     c.execute('''CREATE TABLE IF NOT EXISTS reports (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
@@ -118,8 +119,35 @@ def init_reports_db():
         coverage REAL,
         preview_path TEXT,
         status TEXT DEFAULT "Pending",
-        created_at TEXT
+        created_at TEXT,
+        latitude REAL,
+        longitude REAL
     )''')
+    conn.commit()
+    conn.close()
+    # Ensure existing DB has new columns
+    migrate_reports_db_add_coords()
+
+def migrate_reports_db_add_coords():
+    """Add latitude/longitude columns if they don't exist (safe ALTER)."""
+    conn = sqlite3.connect('reports.db')
+    cursor = conn.cursor()
+
+    # Find existing columns
+    cursor.execute("PRAGMA table_info(reports);")
+    cols = [row[1] for row in cursor.fetchall()]
+
+    if 'latitude' not in cols:
+        try:
+            cursor.execute("ALTER TABLE reports ADD COLUMN latitude REAL;")
+        except Exception as e:
+            print("Could not add latitude column:", e)
+    if 'longitude' not in cols:
+        try:
+            cursor.execute("ALTER TABLE reports ADD COLUMN longitude REAL;")
+        except Exception as e:
+            print("Could not add longitude column:", e)
+
     conn.commit()
     conn.close()
 
@@ -165,12 +193,15 @@ def add_citizen():
 
 
 # --- API: Report Issue ---
+# --- API: Report Issue ---
 @app.route("/report", methods=["GET", "POST"])
 def report():
     if request.method == "POST":
         name = request.form.get("name")
         location = request.form.get("location")
         description = request.form.get("description")
+        latitude = request.form.get("latitude")
+        longitude = request.form.get("longitude")
         image = request.files.get("image")
         captured_image = request.form.get("captured_image")
         image_path = None
@@ -198,19 +229,21 @@ def report():
 
         conn = sqlite3.connect("reports.db")
         cursor = conn.cursor()
+
+        # Add latitude and longitude columns to the insert statement
         cursor.execute(
             '''INSERT INTO reports 
-            (name, location, description, image_path, severity, coverage, preview_path, status, created_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-            (name, location, description, image_path, severity, coverage, preview_path, status, created_at)
+            (name, location, description, latitude, longitude, image_path, severity, coverage, preview_path, status, created_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+            (name, location, description, latitude, longitude, image_path, severity, coverage, preview_path, status, created_at)
         )
         conn.commit()
         conn.close()
 
         return render_template("success.html", message="Report submitted successfully!")
 
-    # 👇 If GET request → show report form
     return render_template("report_form.html")
+
 
 @app.route("/employee/logout")
 def employee_logout():
