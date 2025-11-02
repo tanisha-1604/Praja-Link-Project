@@ -103,12 +103,22 @@ def admin_dashboard():
         cur = conn.cursor()
         cur.execute("SELECT * FROM reports ORDER BY created_at DESC")
         reports = cur.fetchall()
+        
+        # Calculate status counts
+        status_counts = {"all": len(reports), "Reported": 0, "In Review": 0, "Resolved": 0}
+        for report in reports:
+            raw_status = report['status'] or 'Pending'
+            display_status = 'Reported' if raw_status == 'Pending' else raw_status
+            if display_status in status_counts:
+                status_counts[display_status] += 1
+        
         conn.close()
     except Exception as e:
         print("⚠️ Error loading reports for admin dashboard:", e)
         reports = []
+        status_counts = {"all": 0, "Reported": 0, "In Review": 0, "Resolved": 0}
 
-    return render_template("admin_dashboard.html", reports=reports)
+    return render_template("admin_dashboard.html", reports=reports, status_counts=status_counts)
 
 
 @app.route("/update_status/<int:report_id>", methods=["POST"])
@@ -304,6 +314,26 @@ def report():
 def employee_logout():
     session.pop("employee", None)
     return redirect(url_for("employee"))
+
+
+@app.route("/report/<int:report_id>")
+def report_details(report_id):
+    """Display detailed view of a single report"""
+    try:
+        conn = sqlite3.connect("reports.db")
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM reports WHERE id = ?", (report_id,))
+        report = cur.fetchone()
+        conn.close()
+        
+        if not report:
+            return render_template("error.html", message="Report not found"), 404
+        
+        return render_template("report_details.html", report=report)
+    except Exception as e:
+        print("⚠️ Error loading report:", e)
+        return render_template("error.html", message="Could not load report"), 500
 
 
 # --- Run App ---

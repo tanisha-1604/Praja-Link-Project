@@ -39,44 +39,39 @@
             <h3 class="section-title">Recent Critical Issues</h3>
         </div>
 
-        {% for report in reports %}
-        <div class="issue-card card p-3 mb-3">
-            <div class="issue-header">
-                <h4><i class="fa-solid fa-triangle-exclamation"></i> {{ report['name'] or 'Unnamed Report' }}</h4>
-                <div class="status-tags">
-                    <span class="status {{ report['status']|lower }}">{{ report['status'] }}</span>
-                    {% if report['severity'] %}
-                        <span class="severity {{ report['severity']|lower }}">{{ report['severity'] }}</span>
-                    {% else %}
-                        <span class="severity pending">Pending</span>
-                    {% endif %}
+        <div class="reports-grid">
+            {% for report in reports %}
+            {% set raw_status = report['status'] or 'Pending' %}
+            {% set display_status = 'Reported' if raw_status == 'Pending' else raw_status %}
+            {% set severity = report['severity'] or 'Medium' %}
+            <article class="report-card" data-status="{{ display_status }}" data-id="{{ report['id'] }}">
+                <div class="card__icon">
+                    <i class="fa-solid fa-{{ 'trash-can' if 'garbage' in (report['name'] or '')|lower or 'trash' in (report['name'] or '')|lower else 'droplet' if 'drain' in (report['name'] or '')|lower or 'water' in (report['name'] or '')|lower else 'cloud' if 'air' in (report['name'] or '')|lower else 'flag' }}"></i>
                 </div>
-            </div>
-
-            <p>{{ report['description'] }}</p>
-            <p><i class="fa-solid fa-location-dot"></i> {{ report['location'] }}</p>
-            
-            {% if report['latitude'] and report['longitude'] %}
-            <p>
-                📍 <strong>Coordinates:</strong> 
-                {{ report['latitude'] }}, {{ report['longitude'] }}<br>
-                <a href="https://www.google.com/maps?q={{ report['latitude'] }},{{ report['longitude'] }}" 
-                   target="_blank" 
-                   class="map-link">
-                   View on Google Maps
-                </a>
-            </p>
-            {% endif %}
-
-            <p><i class="fa-solid fa-calendar"></i> {{ report['created_at'] }}</p>
-
-            {% if report['image_path'] %}
-            <img src="{{ url_for('static', filename=report['image_path'].split('static/')[-1]) }}" class="report-image">
-            {% endif %}
+                <div class="card__content">
+                    <header class="card__header">
+                        <h3 class="card__title">{{ report['name'] or 'Untitled Report' }}</h3>
+                        <div class="card__badges">
+                            <span class="badge badge--{{ display_status | lower | replace(' ', '-') }}">{{ display_status }}</span>
+                            <span class="badge badge--severity badge--severity-{{ severity | lower }}">{{ severity }}</span>
+                        </div>
+                    </header>
+                    <div class="card__body">
+                        <p class="desc">{{ (report['description'] or '')[:100] }}{% if (report['description'] or '')|length > 100 %}...{% endif %}</p>
+                        <div class="card__meta">
+                            <p class="meta"><i class="fa-solid fa-location-dot"></i> {{ report['location'] }}</p>
+                            <p class="meta"><i class="fa-solid fa-calendar"></i> {{ report['created_at'] }}</p>
+                        </div>
+                    </div>
+                    <footer class="card__footer">
+                        <a href="{{ url_for('report_details', report_id=report['id']) }}" class="btn btn--view"><i class="fa-solid fa-eye"></i> View Details</a>
+                    </footer>
+                </div>
+            </article>
+            {% else %}
+                <p class="no-data">No reports available.</p>
+            {% endfor %}
         </div>
-        {% else %}
-            <p class="no-data">No reports available.</p>
-        {% endfor %}
     </div>
     
     <footer class="mt-4">

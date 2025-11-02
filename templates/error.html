@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Error | PrajaLink</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        body { font-family:'Poppins','Nunito Sans',sans-serif; background: linear-gradient(180deg, #F6FFFB 0%, #FFFFFF 100%); margin:0; padding:0; display:flex; align-items:center; justify-content:center; min-height:100vh; }
+        .error-container { text-align:center; padding:40px; background:#fff; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+        .error-icon { font-size:48px; color:#dc2626; margin-bottom:20px; }
+        .error-message { font-size:18px; color:#1f2937; margin-bottom:20px; }
+        .back-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:8px; background:#42A5F5; color:#fff; text-decoration:none; transition:all .3s ease; }
+        .back-btn:hover { background:#1e88e5; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon"><i class="fa-solid fa-exclamation-triangle"></i></div>
+        <div class="error-message">{{ message or 'An error occurred' }}</div>
+        <a href="{{ url_for('employee_dashboard') }}" class="back-btn">
+            <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Details | PrajaLink</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkfDqZC1Zq9KKDvZL9Yl8a9kaoV5C1xTfLkG3B1Fz6G8xwG6Fz+6V2T8g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+  <style>
+    body { background: linear-gradient(180deg, #F6FFFB 0%, #FFFFFF 100%); }
+    .back-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:8px; border:none; background:#42A5F5; color:#fff; text-decoration:none; margin-bottom:20px; transition:all .3s ease; }
+    .back-btn:hover { background:#1e88e5; transform: translateY(-1px); }
+    .details-container { max-width:1000px; margin:30px auto; padding:0 20px; }
+    .details-card { background:#fff; border:1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding:30px; margin-bottom:20px; }
+    .details-header { border-bottom:2px solid #e5e7eb; padding-bottom:20px; margin-bottom:20px; }
+    .details-title { font-size:24px; font-weight:600; color:#1f2937; margin:0 0 10px 0; }
+    .details-badges { display:flex; gap:8px; margin-top:10px; }
+    .detail-section { margin:20px 0; }
+    .detail-label { font-size:13px; font-weight:600; color:#6b7280; text-transform:uppercase; margin-bottom:8px; }
+    .detail-value { font-size:16px; color:#1f2937; line-height:1.6; }
+    .map-container { margin:20px 0; border-radius:12px; overflow:hidden; border:1px solid #e5e7eb; }
+    .map-link { display:inline-flex; align-items:center; gap:8px; padding:12px 20px; border-radius:8px; background:#2563eb; color:#fff; text-decoration:none; transition:all .3s ease; }
+    .map-link:hover { background:#1d4ed8; transform: translateY(-1px); }
+    .report-image { max-width:100%; border-radius:12px; margin-top:10px; border:1px solid #e5e7eb; }
+    .badge { padding:6px 12px; border-radius:999px; font-size:12px; font-weight:600; color:#fff; white-space:nowrap; }
+    .badge--reported { background:#FFD54F; color:#78350f; }
+    .badge--in-review { background:#42A5F5; }
+    .badge--resolved { background:#66BB6A; }
+    .badge--severity-critical { background:#dc2626; }
+    .badge--severity-medium { background:#f59e0b; }
+    .badge--severity-low { background:#66BB6A; }
+    .google-map { width:100%; height:400px; border:none; }
+  </style>
+</head>
+<body>
+  <div class="details-container">
+    <a href="{{ url_for('employee_dashboard') }}" class="back-btn">
+      <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+    </a>
+
+    <div class="details-card">
+      <div class="details-header">
+        <h1 class="details-title">
+          <i class="fa-solid fa-{{ 'trash-can' if 'garbage' in (report['name'] or '')|lower or 'trash' in (report['name'] or '')|lower else 'droplet' if 'drain' in (report['name'] or '')|lower or 'water' in (report['name'] or '')|lower else 'cloud' if 'air' in (report['name'] or '')|lower else 'flag' }}"></i>
+          {{ report['name'] or 'Untitled Report' }}
+        </h1>
+        {% set raw_status = report['status'] or 'Pending' %}
+        {% set display_status = 'Reported' if raw_status == 'Pending' else raw_status %}
+        {% set severity = report['severity'] or 'Medium' %}
+        <div class="details-badges">
+          <span class="badge badge--{{ display_status | lower | replace(' ', '-') }}">{{ display_status }}</span>
+          <span class="badge badge--severity badge--severity-{{ severity | lower }}">{{ severity }}</span>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">Description</div>
+        <div class="detail-value">{{ report['description'] or 'No description provided' }}</div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-label">Location</div>
+        <div class="detail-value">
+          <i class="fa-solid fa-location-dot"></i> {{ report['location'] or 'N/A' }}
+        </div>
+      </div>
+
+      {% if report['latitude'] and report['longitude'] %}
+      <div class="detail-section">
+        <div class="detail-label">Map Location</div>
+        <div class="map-container">
+          <iframe 
+            class="google-map"
+            loading="lazy"
+            allowfullscreen
+            referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps?q={{ report['latitude'] }},{{ report['longitude'] }}&output=embed">
+          </iframe>
+        </div>
+        <a href="https://www.google.com/maps?q={{ report['latitude'] }},{{ report['longitude'] }}" 
+           target="_blank" 
+           class="map-link">
+          <i class="fa-solid fa-external-link-alt"></i> Open in Google Maps
+        </a>
+      </div>
+      {% endif %}
+
+      <div class="detail-section">
+        <div class="detail-label">Reported On</div>
+        <div class="detail-value">
+          <i class="fa-solid fa-calendar"></i> {{ report['created_at'] or 'N/A' }}
+        </div>
+      </div>
+
+      {% if report['image_path'] %}
+      <div class="detail-section">
+        <div class="detail-label">Attached Image</div>
+        <img src="{{ url_for('static', filename=report['image_path'].split('static/')[-1]) }}" 
+             alt="Report image" 
+             class="report-image">
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>
+
