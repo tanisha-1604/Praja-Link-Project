@@ -1,6 +1,9 @@
 from flask import Flask, request, jsonify, render_template
 from flask import redirect, url_for, session
 from flask_cors import CORS
+from model.severity_calc_final import calculate_severity
+import numpy as np
+import cv2
 import sqlite3
 import os
 from datetime import datetime
@@ -258,7 +261,6 @@ def add_citizen():
 
 
 # --- API: Report Issue ---
-# --- API: Report Issue ---
 @app.route("/report", methods=["GET", "POST"])
 def report():
     if request.method == "POST":
@@ -273,11 +275,11 @@ def report():
 
         os.makedirs("static/uploads", exist_ok=True)
 
+        # --- Save uploaded or captured image ---
         if image and image.filename:
             image_path = f"static/uploads/{image.filename}"
             image.save(image_path)
         elif captured_image:
-            # Decode base64 string and save it as image
             header, data = captured_image.split(',', 1)
             image_data = base64.b64decode(data)
             image_filename = f"captured_{datetime.now().strftime('%Y%m%d%H%M%S')}.png"
@@ -285,29 +287,76 @@ def report():
             with open(image_path, "wb") as f:
                 f.write(image_data)
 
-        # These fields will be updated when the model is integrated
-        severity = None
-        coverage = None
-        preview_path = None
-        status = "Pending"
-        created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # ✅ Store form data temporarily in session until analysis completes
+        session["report_data"] = {
+            "name": name,
+            "location": location,
+            "description": description,
+            "latitude": latitude,
+            "longitude": longitude,
+            "image_path": image_path
+        }
 
-        conn = sqlite3.connect("reports.db")
-        cursor = conn.cursor()
-
-        # Add latitude and longitude columns to the insert statement
-        cursor.execute(
-            '''INSERT INTO reports 
-            (name, location, description, latitude, longitude, image_path, severity, coverage, preview_path, status, created_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-            (name, location, description, latitude, longitude, image_path, severity, coverage, preview_path, status, created_at)
-        )
-        conn.commit()
-        conn.close()
-
-        return render_template("success.html", message="Report submitted successfully!")
+        # Redirect to analysis page for polygon marking
+        image_name = os.path.basename(image_path)
+        return redirect(url_for("analyze", image_name=image_name))
 
     return render_template("report_form.html")
+
+
+@app.route("/analyze", methods=["GET"])
+def analyze():
+    image_name = request.args.get("image_name")
+    category = "general"  # You can make this dynamic later
+    return render_template("analyze_final.html", image_name=image_name, category=category)
+
+@app.route("/process_polygon", methods=["POST"])
+def process_polygon():
+    data = request.get_json(force=True)
+    points = data.get("points", [])
+    image_name = data.get("image_name", "")
+    category = data.get("category", "")
+
+    image_path = os.path.join("static", "uploads", image_name)
+
+    # --- Run your existing model ---
+    try:
+        coverage, severity = calculate_severity(image_path, points)
+    except Exception as e:
+        print("⚠️ Model failed:", e)
+        return jsonify({"error": "Model failed"}), 500
+
+    # Retrieve temporarily saved data
+    report_data = session.pop("report_data", {})
+    name = report_data.get("name")
+    location = report_data.get("location")
+    description = report_data.get("description")
+    latitude = report_data.get("latitude")
+    longitude = report_data.get("longitude")
+
+    # --- Save final report to DB ---
+    status = "Pending"
+    created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    preview_path = None
+
+    conn = sqlite3.connect("reports.db")
+    cur = conn.cursor()
+    cur.execute(
+        '''INSERT INTO reports 
+        (name, location, description, latitude, longitude, image_path, severity, coverage, preview_path, status, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+        (name, location, description, latitude, longitude, image_path, severity, coverage, preview_path, status, created_at)
+    )
+    conn.commit()
+    conn.close()
+
+    print(f"✅ Saved report: {severity=}, {coverage=}")
+
+    return jsonify({"severity": severity, "coverage": coverage})
+
+@app.route("/thankyou")
+def thankyou():
+    return render_template("success.html", message="✅ Thank You for Your Contribution! 🌱 Together, we’re building a cleaner and safer community.")
 
 
 @app.route("/employee/logout")

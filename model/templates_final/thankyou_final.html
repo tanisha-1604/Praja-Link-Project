@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thank You | Prajalink</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style_final.css') }}">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .thankyou-container {
+      text-align: center;
+      background: #ffffff;
+      padding: 60px;
+      border-radius: 20px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+      max-width: 550px;
+      width: 90%;
+      transition: transform 0.3s ease;
+    }
+
+    .thankyou-container:hover {
+      transform: translateY(-5px);
+    }
+
+    .thankyou-container img {
+      max-width: 220px;
+      margin-bottom: 25px;
+      border-radius: 10px;
+    }
+
+    h2 {
+      color: #007bff;
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #444;
+      font-size: 18px;
+    }
+
+    .btn-back {
+      display: inline-block;
+      margin-top: 25px;
+      padding: 12px 24px;
+      background: #007bff;
+      color: #fff;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background 0.3s;
+    }
+
+    .btn-back:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="thankyou-container">
+    <img src="{{ url_for('static', filename='prajalink_thankyou_final.png') }}" alt="Prajalink Logo">
+    <h2>Prajalink — Transform Complaints into Changes</h2>
+    <p>Thank you for your contribution! Your report has been successfully submitted.</p>
+    <a href="{{ url_for('index') }}" class="btn-back">Submit Another Report</a>
+  </div>
+</body>
+</html>

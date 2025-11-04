@@ -1,0 +1,128 @@
+/* ================================
+   P r a j a l i n k   F i n a l
+   Global Style Sheet
+   ================================ */
+
+:root {
+  --primary: #007bff;
+  --primary-dark: #0056b3;
+  --bg: #f4f7fb;
+  --text: #333;
+  --muted: #666;
+  --success: #28a745;
+  --error: #dc3545;
+  --radius: 12px;
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== General Body ===== */
+body {
+  font-family: "Poppins", Arial, sans-serif;
+  background: var(--bg);
+  margin: 0;
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  color: var(--text);
+}
+
+/* ===== Main Container ===== */
+.container {
+  width: 800px;
+  max-width: 95%;
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 30px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+/* ===== Headings ===== */
+h1 {
+  color: var(--primary);
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+p {
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+/* ===== Form Elements ===== */
+label {
+  display: block;
+  font-weight: 600;
+  margin-top: 15px;
+  text-align: left;
+}
+
+select,
+input[type=file],
+button {
+  width: 100%;
+  padding: 10px 14px;
+  margin-top: 8px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+
+/* ===== Buttons ===== */
+button {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--primary-dark);
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+/* ===== Canvas ===== */
+canvas {
+  display: block;
+  margin: 20px auto;
+  border: 2px dashed #999;
+  border-radius: 10px;
+  max-width: 100%;
+}
+
+/* ===== Thank You Page ===== */
+.thankyou-container {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.thankyou-container img {
+  max-width: 250px;
+  margin-bottom: 20px;
+}
+
+.thankyou-container h2 {
+  color: var(--primary);
+  font-size: 26px;
+  margin-top: 20px;
+}
+
+.thankyou-container p {
+  color: var(--muted);
+  font-size: 16px;
+}
+
+/* ===== Utilities ===== */
+.center {
+  text-align: center;
+}
+
+.hidden {
+  display: none;
+}
