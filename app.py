@@ -21,8 +21,7 @@ def home():
 
 @app.route("/services")
 def services():
-    # This opens the report submission form (citizen side)
-    return render_template("report_form.html")
+    return render_template("services.html")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -152,6 +151,10 @@ def update_status(report_id: int):
 def login():
     return render_template("login.html")
 
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
 @app.route("/admin")
 def admin():
     return render_template("admin.html")
@@ -182,6 +185,7 @@ def init_reports_db():
         name TEXT,
         location TEXT,
         description TEXT,
+        category TEXT,
         image_path TEXT,
         severity TEXT,
         coverage REAL,
@@ -197,7 +201,7 @@ def init_reports_db():
     migrate_reports_db_add_coords()
 
 def migrate_reports_db_add_coords():
-    """Add latitude/longitude columns if they don't exist (safe ALTER)."""
+    """Add latitude/longitude/category columns if they don't exist (safe ALTER)."""
     conn = sqlite3.connect('reports.db')
     cursor = conn.cursor()
 
@@ -215,6 +219,11 @@ def migrate_reports_db_add_coords():
             cursor.execute("ALTER TABLE reports ADD COLUMN longitude REAL;")
         except Exception as e:
             print("Could not add longitude column:", e)
+    if 'category' not in cols:
+        try:
+            cursor.execute("ALTER TABLE reports ADD COLUMN category TEXT;")
+        except Exception as e:
+            print("Could not add category column:", e)
 
     conn.commit()
     conn.close()
@@ -267,6 +276,7 @@ def report():
         name = request.form.get("name")
         location = request.form.get("location")
         description = request.form.get("description")
+        category = request.form.get("category")
         latitude = request.form.get("latitude")
         longitude = request.form.get("longitude")
         image = request.files.get("image")
@@ -292,6 +302,7 @@ def report():
             "name": name,
             "location": location,
             "description": description,
+            "category": category,
             "latitude": latitude,
             "longitude": longitude,
             "image_path": image_path
@@ -331,22 +342,40 @@ def process_polygon():
     name = report_data.get("name")
     location = report_data.get("location")
     description = report_data.get("description")
+    category_form = report_data.get("category")
     latitude = report_data.get("latitude")
     longitude = report_data.get("longitude")
 
-    # --- Save final report to DB ---
+    # --- Save or update final report in DB ---
     status = "Pending"
     created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     preview_path = None
 
     conn = sqlite3.connect("reports.db")
     cur = conn.cursor()
+
+    # Try to update existing record by full image_path
     cur.execute(
-        '''INSERT INTO reports 
-        (name, location, description, latitude, longitude, image_path, severity, coverage, preview_path, status, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-        (name, location, description, latitude, longitude, image_path, severity, coverage, preview_path, status, created_at)
+        "UPDATE reports SET severity = ?, coverage = ? WHERE image_path = ?",
+        (severity, coverage, image_path)
     )
+
+    # If nothing updated, try to match by image_name (basename)
+    if cur.rowcount == 0:
+        cur.execute(
+            "UPDATE reports SET severity = ?, coverage = ? WHERE image_path LIKE ?",
+            (severity, coverage, f"%{image_name}")
+        )
+
+    # If still nothing updated, insert a new record
+    if cur.rowcount == 0:
+        cur.execute(
+            '''INSERT INTO reports 
+            (name, location, description, category, latitude, longitude, image_path, severity, coverage, preview_path, status, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+            (name, location, description, category_form, latitude, longitude, image_path, severity, coverage, preview_path, status, created_at)
+        )
+
     conn.commit()
     conn.close()
 

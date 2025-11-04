@@ -1,0 +1,270 @@
+/* ============================================================
+   About Us Page Styles
+   Matching the design specification
+   ============================================================ */
+
+/* Import Poppins font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+/* ---------- BODY & BACKGROUND ---------- */
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /* Gradient background from light teal to darker greenish-blue */
+  background: linear-gradient(180deg, #a8e6cf 0%, #7fd4b8 35%, #5bc4a3 70%, #2e8b57 100%);
+  background-attachment: fixed;
+}
+
+/* ---------- NAVBAR STYLING ---------- */
+header.navbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #D6E3E6;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* ---------- ABOUT US SECTION ---------- */
+.about-section {
+  text-align: center;
+  padding: 80px 20px 60px;
+  margin: 0;
+  background: transparent;
+}
+
+.about-section h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #114a59;
+  margin: 0 0 25px;
+  letter-spacing: -0.5px;
+}
+
+.about-description {
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #2d5963;
+  margin: 0 auto;
+  max-width: 800px;
+  line-height: 1.8;
+}
+
+/* ---------- TEAM SECTION ---------- */
+.team-section {
+  padding: 60px 20px 40px;
+  flex: 1;
+}
+
+.team-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #114a59;
+  text-align: center;
+  margin: 0 0 50px;
+  letter-spacing: -0.5px;
+}
+
+/* ---------- ROW & CARD CONTAINER ---------- */
+.row {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 60px;
+  flex-wrap: wrap;
+}
+
+/* ---------- CARD STYLING ---------- */
+.card {
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  flex: 1 1 250px;
+  min-width: 250px;
+  max-width: 300px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-container {
+  padding: 30px 25px;
+  text-align: left;
+}
+
+.card h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #114a59;
+  margin: 0 0 8px;
+  line-height: 1.3;
+}
+
+.card .title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #555;
+  margin: 0 0 15px;
+}
+
+.card .description {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: #666;
+  margin: 0 0 15px;
+  line-height: 1.6;
+}
+
+.card .email {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #555;
+  margin: 0 0 20px;
+  word-break: break-word;
+}
+
+/* ---------- BUTTON STYLING ---------- */
+.button {
+  border: none;
+  outline: 0;
+  display: block;
+  width: 100%;
+  padding: 12px 20px;
+  color: #ffffff;
+  background-color: #2e8b57;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.button:hover {
+  background-color: #246a44;
+  transform: translateY(-2px);
+}
+
+/* ---------- FOOTER ---------- */
+footer {
+  background: transparent;
+  padding: 40px 20px 30px;
+  margin-top: auto;
+  width: 100%;
+}
+
+.footer-container {
+  text-align: center;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+footer span {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: #333;
+  letter-spacing: 0.3px;
+}
+
+/* ---------- RESPONSIVE DESIGN ---------- */
+@media (max-width: 1200px) {
+  .row {
+    padding: 0 40px;
+    gap: 25px;
+  }
+  
+  .card {
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 968px) {
+  .row {
+    padding: 0 30px;
+    gap: 20px;
+  }
+  
+  .card {
+    flex: 1 1 calc(50% - 20px);
+    max-width: 100%;
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-section {
+    padding: 60px 20px 40px;
+  }
+
+  .about-section h1 {
+    font-size: 2.2rem;
+  }
+
+  .about-description {
+    font-size: 1rem;
+  }
+
+  .team-section {
+    padding: 40px 20px 30px;
+  }
+
+  .team-title {
+    font-size: 2.2rem;
+    margin-bottom: 30px;
+  }
+
+  .row {
+    flex-direction: column;
+    padding: 0 20px;
+    gap: 20px;
+  }
+
+  .card {
+    flex: 1 1 100%;
+    max-width: 100%;
+    min-width: 100%;
+  }
+
+  .card-container {
+    padding: 25px 20px;
+  }
+
+  .card h2 {
+    font-size: 1.3rem;
+  }
+
+  footer {
+    padding: 30px 20px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-section h1 {
+    font-size: 1.8rem;
+  }
+
+  .team-title {
+    font-size: 1.8rem;
+  }
+
+  .card-container {
+    padding: 20px 18px;
+  }
+
+  .card h2 {
+    font-size: 1.2rem;
+  }
+}

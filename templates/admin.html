@@ -15,10 +15,10 @@
             <img src="{{ url_for('static', filename='logo.png') }}" alt="PMC Care Logo" class="logo">
             <nav>
                 <ul class="list-unstyled d-flex gap-2 m-0">
-                    <li><button class="btn btn-outline-primary">HOME</button></li>
-                    <li><button class="btn btn-outline-primary" onclick="window.location.href='{{ url_for('report') }}'">SERVICES</button></li>
-                    <li><button class="btn btn-outline-primary">FEEDS</button></li>
-                    <li><button class="btn btn-outline-primary">NEAR ME</button></li>
+                    <li><a href="{{ url_for('home') }}" class="btn btn-outline-primary">HOME</a></li>
+                    <li><a href="{{ url_for('services') }}" class="btn btn-outline-primary">SERVICES</a></li>
+                    <li><button class="btn btn-outline-primary">GUIDELINES</button></li>
+                    <li><a href="{{ url_for('about') }}" class="btn btn-outline-primary">ABOUT US</a></li>
                     
                 </ul>
             </nav>
