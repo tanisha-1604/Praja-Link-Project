@@ -4,7 +4,7 @@ from flask_cors import CORS
 from model.severity_calc_final import calculate_severity
 import numpy as np
 import cv2
-import sqlite3
+import pandas as pd
 import os
 from datetime import datetime
 import base64
@@ -22,6 +22,7 @@ def home():
 @app.route("/services")
 def services():
     return render_template("services.html")
+    return render_template("services.html")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -33,14 +34,23 @@ def register():
         phone = request.form.get("phone")
         email = request.form.get("email")
 
-        conn = sqlite3.connect("citizens.db")
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO citizens (name, dob, age, gender, phone, email) VALUES (?, ?, ?, ?, ?, ?)",
-            (name, dob, age, gender, phone, email),
-        )
-        conn.commit()
-        conn.close()
+        # --- CSV-based insert ---
+    if not os.path.exists("citizens.csv"):
+        init_citizen_db()
+
+        df = pd.read_csv("citizens.csv")
+        new_id = len(df) + 1
+        new_row = pd.DataFrame([{
+            "id": new_id,
+            "name": name,
+            "dob": dob,
+            "age": age,
+            "gender": gender,
+            "phone": phone,
+            "email": email
+        }])
+        df = pd.concat([df, new_row], ignore_index=True)
+        df.to_csv("citizens.csv", index=False)
 
         # After successful registration
         return render_template("report_redirect.html", message="Registration successful!")
@@ -78,12 +88,12 @@ def employee_dashboard():
         print("⚠️ init_reports_db failed:", e)
 
     try:
-        conn = sqlite3.connect("reports.db")
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM reports ORDER BY created_at DESC")
-        reports = cursor.fetchall()
-        conn.close()
+        if not os.path.exists("reports.csv"):
+            init_reports_db()
+
+        df = pd.read_csv("reports.csv")
+        df = df.sort_values(by="created_at", ascending=False)
+        reports = df.to_dict(orient="records")
         error_message = None
     except Exception as e:
         print("⚠️ Error loading reports:", e)
@@ -100,12 +110,12 @@ def admin_dashboard():
         return redirect(url_for("employee"))
 
     try:
-        conn = sqlite3.connect("reports.db")
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM reports ORDER BY created_at DESC")
-        reports = cur.fetchall()
-        
+        if not os.path.exists("reports.csv"):
+            init_reports_db()
+
+        df = pd.read_csv("reports.csv")
+        df = df.sort_values(by="created_at", ascending=False)
+        reports = df.to_dict(orient="records")
         # Calculate status counts
         status_counts = {"all": len(reports), "Reported": 0, "In Review": 0, "Resolved": 0}
         for report in reports:
@@ -113,8 +123,7 @@ def admin_dashboard():
             display_status = 'Reported' if raw_status == 'Pending' else raw_status
             if display_status in status_counts:
                 status_counts[display_status] += 1
-        
-        conn.close()
+ 
     except Exception as e:
         print("⚠️ Error loading reports for admin dashboard:", e)
         reports = []
@@ -131,17 +140,19 @@ def update_status(report_id: int):
     try:
         data = request.get_json(force=True)
         new_status = (data.get("status") or "").strip()
-        # Map display values back to DB values
-        # UI shows "Reported" for DB "Pending"
         db_status = "Pending" if new_status == "Reported" else new_status
 
-        conn = sqlite3.connect("reports.db")
-        cur = conn.cursor()
-        cur.execute("UPDATE reports SET status = ? WHERE id = ?", (db_status, report_id))
-        conn.commit()
-        conn.close()
+        if not os.path.exists("reports.csv"):
+            init_reports_db()
 
-        return jsonify({"message": "Status updated", "status": new_status})
+        df = pd.read_csv("reports.csv")
+        if report_id in df['id'].values:
+            df.loc[df['id'] == report_id, 'status'] = db_status
+            df.to_csv("reports.csv", index=False)
+            return jsonify({"message": "Status updated", "status": new_status})
+        else:
+            return jsonify({"message": "Report not found"}), 404
+        
     except Exception as e:
         print("⚠️ Failed to update status:", e)
         return jsonify({"message": "Update failed"}), 500
@@ -155,6 +166,10 @@ def login():
 def about():
     return render_template("about.html")
 
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
 @app.route("/admin")
 def admin():
     return render_template("admin.html")
@@ -162,77 +177,23 @@ def admin():
 
 # --- Database setup ---
 def init_citizen_db():
-    conn = sqlite3.connect('citizens.db')
-    c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS citizens (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        dob TEXT,
-        age INTEGER,
-        gender TEXT,
-        phone TEXT,
-        email TEXT
-    )''')
-    conn.commit()
-    conn.close()
+    """Ensure citizens.csv exists with correct headers."""
+    if not os.path.exists('citizens.csv'):
+        df = pd.DataFrame(columns=['id', 'name', 'dob', 'age', 'gender', 'phone', 'email'])
+        df.to_csv('citizens.csv', index=False)
+        print("✅ Created citizens.csv")
 
 def init_reports_db():
-    conn = sqlite3.connect('reports.db')
-    c = conn.cursor()
-    # Create table with latitude/longitude included (safe for new DBs)
-    c.execute('''CREATE TABLE IF NOT EXISTS reports (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        location TEXT,
-        description TEXT,
-        category TEXT,
-        image_path TEXT,
-        severity TEXT,
-        coverage REAL,
-        preview_path TEXT,
-        status TEXT DEFAULT "Pending",
-        created_at TEXT,
-        latitude REAL,
-        longitude REAL
-    )''')
-    conn.commit()
-    conn.close()
-    # Ensure existing DB has new columns
-    migrate_reports_db_add_coords()
+    """Ensure reports.csv exists with correct headers."""
+    if not os.path.exists('reports.csv'):
+        df = pd.DataFrame(columns=[
+            'id', 'name', 'location', 'description', 'category',
+            'image_path', 'severity', 'coverage', 'preview_path',
+            'status', 'created_at', 'latitude', 'longitude'
+        ])
+        df.to_csv('reports.csv', index=False)
+        print("✅ Created reports.csv")
 
-def migrate_reports_db_add_coords():
-    """Add latitude/longitude/category columns if they don't exist (safe ALTER)."""
-    conn = sqlite3.connect('reports.db')
-    cursor = conn.cursor()
-
-    # Find existing columns
-    cursor.execute("PRAGMA table_info(reports);")
-    cols = [row[1] for row in cursor.fetchall()]
-
-    if 'latitude' not in cols:
-        try:
-            cursor.execute("ALTER TABLE reports ADD COLUMN latitude REAL;")
-        except Exception as e:
-            print("Could not add latitude column:", e)
-    if 'longitude' not in cols:
-        try:
-            cursor.execute("ALTER TABLE reports ADD COLUMN longitude REAL;")
-        except Exception as e:
-            print("Could not add longitude column:", e)
-    if 'category' not in cols:
-        try:
-            cursor.execute("ALTER TABLE reports ADD COLUMN category TEXT;")
-        except Exception as e:
-            print("Could not add category column:", e)
-
-    conn.commit()
-    conn.close()
-
-
-def get_db_connection():
-    conn = sqlite3.connect('citizens.db')
-    conn.row_factory = sqlite3.Row
-    return conn
 
 
 @app.route('/test', methods=['GET'])
@@ -254,20 +215,28 @@ def add_citizen():
     email = data.get('email', '')
 
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute(
-            'INSERT INTO citizens (name, dob, age, gender, phone, email) VALUES (?, ?, ?, ?, ?, ?)',
-            (name, dob, age, gender, phone, email)
-        )
-        conn.commit()
-        conn.close()
+        if not os.path.exists("citizens.csv"):
+            init_citizen_db()
+
+        df = pd.read_csv("citizens.csv")
+        new_id = len(df) + 1
+        new_row = pd.DataFrame([{
+            "id": new_id,
+            "name": name,
+            "dob": dob,
+            "age": age,
+            "gender": gender,
+            "phone": phone,
+            "email": email
+        }])
+        df = pd.concat([df, new_row], ignore_index=True)
+        df.to_csv("citizens.csv", index=False)
         print("✅ Citizen added successfully!")
         return jsonify({"message": "Registration successful!"}), 201
+    
     except Exception as e:
-        print("⚠️ Database error:", e)
-        return jsonify({"message": "Database error"}), 500
-
+        print("⚠️ Failed to add citizen:", e)
+        return jsonify({"error": "Failed to add citizen"}), 500
 
 # --- API: Report Issue ---
 @app.route("/report", methods=["GET", "POST"])
@@ -351,36 +320,35 @@ def process_polygon():
     created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     preview_path = None
 
-    conn = sqlite3.connect("reports.db")
-    cur = conn.cursor()
+    if not os.path.exists("reports.csv"):
+        init_reports_db()
 
-    # Try to update existing record by full image_path
-    cur.execute(
-        "UPDATE reports SET severity = ?, coverage = ? WHERE image_path = ?",
-        (severity, coverage, image_path)
-    )
+    df = pd.read_csv("reports.csv")
+    image_exists = df['image_path'].astype(str).str.contains(image_name, na=False)
 
-    # If nothing updated, try to match by image_name (basename)
-    if cur.rowcount == 0:
-        cur.execute(
-            "UPDATE reports SET severity = ?, coverage = ? WHERE image_path LIKE ?",
-            (severity, coverage, f"%{image_name}")
-        )
+    if image_exists.any():
+        df.loc[image_exists, ['severity', 'coverage']] = [severity, coverage]
+    else:
+        new_id = len(df) + 1
+        new_row = pd.DataFrame([{
+            "id": new_id,
+            "name": name,
+            "location": location,
+            "description": description,
+            "category": category_form,
+            "latitude": latitude,
+            "longitude": longitude,
+            "image_path": image_path,
+            "severity": severity,
+            "coverage": coverage,
+            "preview_path": None,
+            "status": status,
+            "created_at": created_at
+    }])
+    df = pd.concat([df, new_row], ignore_index=True)
 
-    # If still nothing updated, insert a new record
-    if cur.rowcount == 0:
-        cur.execute(
-            '''INSERT INTO reports 
-            (name, location, description, category, latitude, longitude, image_path, severity, coverage, preview_path, status, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-            (name, location, description, category_form, latitude, longitude, image_path, severity, coverage, preview_path, status, created_at)
-        )
-
-    conn.commit()
-    conn.close()
-
+    df.to_csv("reports.csv", index=False)
     print(f"✅ Saved report: {severity=}, {coverage=}")
-
     return jsonify({"severity": severity, "coverage": coverage})
 
 @app.route("/thankyou")
@@ -398,12 +366,12 @@ def employee_logout():
 def report_details(report_id):
     """Display detailed view of a single report"""
     try:
-        conn = sqlite3.connect("reports.db")
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM reports WHERE id = ?", (report_id,))
-        report = cur.fetchone()
-        conn.close()
+        if not os.path.exists("reports.csv"):
+            init_reports_db()
+
+        df = pd.read_csv("reports.csv")
+        report = df.loc[df['id'] == report_id].to_dict(orient="records")
+        report = report[0] if report else None
         
         if not report:
             return render_template("error.html", message="Report not found"), 404
